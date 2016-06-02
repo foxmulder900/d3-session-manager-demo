@@ -1,14 +1,14 @@
 (function(){
 	var stage = d3.select('#stage'),
 		bounds = stage.node().getBoundingClientRect(),
-		data = [];
+		userSessions = [];
 
 	var colorScale = d3.scale.linear()
 		.domain([0, 200000])
 		.range(['#969300', '#B1F800']);
 
 	var forceLayout = d3.layout.force()
-		.nodes(data)
+		.nodes(userSessions)
 		.size([bounds.width, bounds.height-150])
 		.charge(-60)
 		.chargeDistance(800)
@@ -16,19 +16,13 @@
 
 	function updateData(){
 		var userBubbles = stage.selectAll('circle')
-			.data(forceLayout.nodes(), function(d){
-				return d.username;
-			});
+			.data(forceLayout.nodes(), function(d){ return d.username; });
 
 		userBubbles
 			.attr("cx", function(d) { return d.x; })
 			.attr("cy", function(d) { return d.y; })
-			.style("fill", function(d){
-				return colorScale(new Date() - d.createdTimestamp);
-			})
-			.style("stroke", function(d){
-				return d.flaggedPosts > 10 ? 'red' : '#270043';
-			});
+			.style("fill", function(d){ return colorScale(new Date() - d.createdTimestamp); })
+			.style("stroke", function(d){ return d.flaggedPosts > 10 ? 'red' : '#270043'; });
 
 		userBubbles.enter().append('circle')
 			.attr('r', 15)
@@ -36,8 +30,7 @@
 			.on('mouseover', showDetails)
 			.on('mouseout', hideDetails);
 
-		userBubbles.exit()
-			.remove();
+		userBubbles.exit().remove();
 		
 		forceLayout.start();
 	}
@@ -55,12 +48,10 @@
 			.style("fill", "#3B0065");
 
 		tooltip.append("foreignObject")
-			.attr('x', 5)
-			.attr('y', 5)
+			.attr('x', 10)
+			.attr('y', 10)
 			.attr("width", 220)
 			.attr("height", 70)
-			.append("xhtml:body")
-			.style("background-color", "#3B0065")
 			.html(buildDetails(d));
 	}
 
@@ -69,7 +60,6 @@
 		return "<b>"+d.username+"</b><br>" +
 			   "Session age: "+ sessionAge+" minute(s)<br>" +
 			   "Flagged posts: "+ d.flaggedPosts;
-
 	}
 
 	function hideDetails(){
@@ -78,17 +68,26 @@
 
 	function removeDatum(d){
 		hideDetails();
-		var idx = data.indexOf(d);
-		data.splice(idx, 1);
+		userSessions.splice(userSessions.indexOf(d), 1);
+	}
+
+	function createUserSession(username){
+		userSessions.push({
+			username: username,
+			flaggedPosts: Math.floor(Math.random()*12),
+			createdTimestamp: new Date(),
+			x: Math.random() * bounds.width,
+			y: bounds.height - Math.random()*150
+		});
 	}
 
 	d3.select('#login-button').on('click', function(){
 		var input = d3.select('input[name=username]'),
 			username = input.property('value');
 		if(username){
-			createUserSession();
+			createUserSession(username);
+			input.property('value','');
 			updateData();
-			input.property('value','')
 		}
 	});
 
@@ -98,14 +97,4 @@
 		}
 		updateData();
 	});
-
-	function createUserSession(username){
-		data.push({
-			username: username,
-			flaggedPosts: Math.floor(Math.random()*12),
-			createdTimestamp: new Date(),
-			x: Math.random() * bounds.width,
-			y: bounds.height - Math.random()*150
-		});
-	}
 })();

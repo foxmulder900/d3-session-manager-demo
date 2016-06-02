@@ -3,6 +3,7 @@ html, body {
     background-color: indigo;
     color: azure;
 }
+
 section {
     height: 100%;
     margin-bottom: -100px;
@@ -22,11 +23,6 @@ footer > div {
     width: 200px;
     padding: 0 50px;
 }
-
-.login-form {
-    width: 200px;
-    margin: auto;
-}
 footer input {
     width: 100%;
     opacity: 0.5;
@@ -34,7 +30,9 @@ footer input {
 }
 footer input:focus {
     opacity: 0.8;
+
 }
+
 #login-button,
 #random-button{
     opacity: 1 !important;

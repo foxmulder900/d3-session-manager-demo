@@ -1,3 +1,5 @@
+//Source: http://www.nextpoint.se/?p=447
+
 var USERNAMES = [
 	"Alvin",
 	"Angelica Pickles",
